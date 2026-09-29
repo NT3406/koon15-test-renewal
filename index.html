@@ -1,1 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Koon15 ต่ออายุที่จอดรถ</title>
 
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+    .row {
+      padding: 13px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .label {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 5px;
+    }
+
+    .value {
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .status {
+      margin-top: 25px;
+      padding: 15px;
+      background: #f0f7ff;
+      border-radius: 12px;
+      text-align: center;
+      color: #2563eb;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="card">
+
+      <h1>🚗 Koon15</h1>
+
+      <div class="subtitle">
+        ระบบต่ออายุที่จอดรถ
+      </div>
+
+      <div class="row">
+        <div class="label">รหัสอ้างอิง</div>
+        <div class="value" id="ref">กำลังโหลด...</div>
+      </div>
+
+      <div class="row">
+        <div class="label">ชื่อผู้เช่า</div>
+        <div class="value" id="name">กำลังโหลด...</div>
+      </div>
+
+      <div class="row">
+        <div class="label">ช่องจอด</div>
+        <div class="value" id="slot">กำลังโหลด...</div>
+      </div>
+
+      <div class="row">
+        <div class="label">รอบเดือน</div>
+        <div class="value" id="month">กำลังโหลด...</div>
+      </div>
+
+      <div class="row">
+        <div class="label">ค่าบริการ</div>
+        <div class="value" id="amount">กำลังโหลด...</div>
+      </div>
+
+      <div class="status">
+        หน้าทดสอบระบบต่ออายุ Koon15
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
