@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Koon15 ต่ออายุที่จอดรถ</title>
 
   <style>
@@ -54,59 +55,142 @@
       font-weight: bold;
     }
 
-    .status {
-      margin-top: 25px;
+    .loading {
+      text-align: center;
+      color: #777;
+      padding: 20px;
+    }
+
+    .error {
+      background: #fff1f1;
+      color: #c62828;
       padding: 15px;
-      background: #f0f7ff;
       border-radius: 12px;
       text-align: center;
-      color: #2563eb;
+      margin-top: 20px;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
-    <div class="card">
+<div class="container">
 
-      <h1>🚗 Koon15</h1>
+  <div class="card">
 
-      <div class="subtitle">
-        ระบบต่ออายุที่จอดรถ
-      </div>
+    <h1>🚗 Koon15</h1>
+
+    <div class="subtitle">
+      ระบบต่ออายุที่จอดรถ
+    </div>
+
+    <div id="loading" class="loading">
+      กำลังตรวจสอบข้อมูล...
+    </div>
+
+    <div id="data" style="display:none;">
 
       <div class="row">
         <div class="label">รหัสอ้างอิง</div>
-        <div class="value" id="ref">กำลังโหลด...</div>
+        <div class="value" id="ref"></div>
       </div>
 
       <div class="row">
         <div class="label">ชื่อผู้เช่า</div>
-        <div class="value" id="name">กำลังโหลด...</div>
+        <div class="value" id="name"></div>
       </div>
 
       <div class="row">
         <div class="label">ช่องจอด</div>
-        <div class="value" id="slot">กำลังโหลด...</div>
+        <div class="value" id="slot"></div>
       </div>
 
       <div class="row">
         <div class="label">รอบเดือน</div>
-        <div class="value" id="month">กำลังโหลด...</div>
+        <div class="value" id="month"></div>
       </div>
 
       <div class="row">
         <div class="label">ค่าบริการ</div>
-        <div class="value" id="amount">กำลังโหลด...</div>
-      </div>
-
-      <div class="status">
-        หน้าทดสอบระบบต่ออายุ Koon15
+        <div class="value" id="amount"></div>
       </div>
 
     </div>
+
+    <div id="error" class="error" style="display:none;"></div>
+
   </div>
+
+</div>
+
+<script>
+
+const API_URL =
+  'https://script.google.com/macros/s/AKfycbxcPRUNhcp83db0DB2o3fPWtyXW5ENa-IAsHdVPOX9LMS6rsPezfal3z3MZj1lTo-m8/exec';
+
+const params = new URLSearchParams(window.location.search);
+
+const ref = params.get('ref');
+
+if (!ref) {
+
+  showError('ไม่พบรหัสอ้างอิงต่ออายุ');
+
+} else {
+
+  fetch(API_URL + '?ref=' + encodeURIComponent(ref))
+    .then(response => response.json())
+    .then(data => {
+
+      if (!data.success) {
+        showError(data.error || 'ไม่พบข้อมูล');
+        return;
+      }
+
+      document.getElementById('ref').textContent =
+        data.ref;
+
+      document.getElementById('name').textContent =
+        data.name;
+
+      document.getElementById('slot').textContent =
+        data.slot;
+
+      document.getElementById('month').textContent =
+        data.month;
+
+      document.getElementById('amount').textContent =
+        Number(data.amount).toLocaleString('th-TH') + ' บาท';
+
+      document.getElementById('loading').style.display =
+        'none';
+
+      document.getElementById('data').style.display =
+        'block';
+
+    })
+    .catch(error => {
+
+      showError('ไม่สามารถเชื่อมต่อระบบได้');
+
+      console.error(error);
+
+    });
+}
+
+function showError(message) {
+
+  document.getElementById('loading').style.display =
+    'none';
+
+  document.getElementById('error').textContent =
+    message;
+
+  document.getElementById('error').style.display =
+    'block';
+}
+
+</script>
 
 </body>
 </html>
