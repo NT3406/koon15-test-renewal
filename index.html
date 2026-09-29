@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -70,6 +71,41 @@
       margin-top: 20px;
     }
 
+    /* QR */
+    #qrSection {
+      display: none;
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    .qr-title {
+      font-size: 17px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .qr-text {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .qr-image {
+      width: 100%;
+      max-width: 320px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .qr-note {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #777;
+    }
+
+    /* แนบสลิป */
     #paymentSection {
       display: none;
       margin-top: 25px;
@@ -119,6 +155,7 @@
       font-weight: bold;
     }
   </style>
+
 </head>
 
 <body>
@@ -127,114 +164,118 @@
 
   <div class="card">
 
-    <h1>🚗 Koon15</h1>
+```
+<h1>🚗 Koon15</h1>
 
-    <div class="subtitle">
-      ระบบต่ออายุที่จอดรถ
-    </div>
-
-    <div id="loading" class="loading">
-      กำลังตรวจสอบข้อมูล...
-    </div>
-
-    <!-- ข้อมูลลูกค้า -->
-    <div id="data" style="display:none;">
-
-      <div class="row">
-        <div class="label">รหัสอ้างอิง</div>
-        <div class="value" id="ref"></div>
-      </div>
-
-      <div class="row">
-        <div class="label">ชื่อผู้เช่า</div>
-        <div class="value" id="name"></div>
-      </div>
-
-      <div class="row">
-        <div class="label">ช่องจอด</div>
-        <div class="value" id="slot"></div>
-      </div>
-
-      <div class="row">
-        <div class="label">รอบเดือน</div>
-        <div class="value" id="month"></div>
-      </div>
-
-      <div class="row">
-        <div class="label">ค่าบริการ</div>
-        <div class="value" id="amount"></div>
-      </div>
-
-    </div>
+<div class="subtitle">
+  ระบบต่ออายุที่จอดรถ
+</div>
 
 
-    <!-- Error -->
-    <div id="error"
-         class="error"
-         style="display:none;">
-    </div>
+<!-- Loading -->
 
-    <!-- QR ชำระเงิน -->
-<div id="qrSection" style="margin-top:25px; text-align:center;">
+<div id="loading" class="loading">
+  กำลังตรวจสอบข้อมูล...
+</div>
 
-  <div style="font-size:16px; font-weight:bold; margin-bottom:12px;">
+
+<!-- ข้อมูลลูกค้า -->
+
+<div id="data" style="display:none;">
+
+  <div class="row">
+    <div class="label">รหัสอ้างอิง</div>
+    <div class="value" id="ref"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">ชื่อผู้เช่า</div>
+    <div class="value" id="name"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">ช่องจอด</div>
+    <div class="value" id="slot"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">รอบเดือน</div>
+    <div class="value" id="month"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">ค่าบริการ</div>
+    <div class="value" id="amount"></div>
+  </div>
+
+</div>
+
+
+<!-- Error -->
+
+<div
+  id="error"
+  class="error"
+  style="display:none;">
+</div>
+
+
+<!-- QR ชำระเงิน -->
+
+<div id="qrSection">
+
+  <div class="qr-title">
     💳 ชำระค่าต่ออายุ
   </div>
 
-  <div style="font-size:15px; margin-bottom:15px;">
+  <div class="qr-text">
     กรุณาสแกน QR Code เพื่อชำระเงิน
   </div>
 
   <img
-    src="QR_PromptPay_พี่รุ่ง.jpg"
+    src="qr-payment.jpg"
     alt="QR สำหรับชำระเงิน"
-    style="
-      width:100%;
-      max-width:320px;
-      border-radius:12px;
-      border:1px solid #ddd;
-    "
+    class="qr-image"
   >
 
-  <div style="
-    margin-top:12px;
-    font-size:14px;
-    color:#777;
-  ">
+  <div class="qr-note">
     หลังชำระเงินแล้ว กรุณาแนบสลิปด้านล่าง
   </div>
 
 </div>
 
 
-    <!-- แนบสลิป -->
-    <div id="paymentSection">
+<!-- แนบสลิป -->
 
-      <div class="payment-title">
-        📎 แนบหลักฐานการชำระเงิน
-      </div>
+<div id="paymentSection">
 
-      <input
-        type="file"
-        id="slipFile"
-        accept="image/*,.pdf">
+  <div class="payment-title">
+    📎 แนบหลักฐานการชำระเงิน
+  </div>
 
-      <button
-        id="uploadBtn"
-        onclick="uploadSlip()">
-        ส่งหลักฐานการชำระเงิน
-      </button>
+  <input
+    type="file"
+    id="slipFile"
+    accept="image/*,.pdf"
+  >
 
-    </div>
+  <button
+    id="uploadBtn"
+    onclick="uploadSlip()">
+    ส่งหลักฐานการชำระเงิน
+  </button>
+
+</div>
 
 
-    <!-- สำเร็จ -->
-    <div id="success"></div>
+<!-- สำเร็จ -->
+
+<div id="success"></div>
+```
 
   </div>
 
 </div>
-
 
 <script>
 
@@ -243,7 +284,9 @@ const API_URL =
 
 
 const params =
-  new URLSearchParams(window.location.search);
+  new URLSearchParams(
+    window.location.search
+  );
 
 
 const ref =
@@ -268,57 +311,96 @@ if (!ref) {
     encodeURIComponent(ref)
   )
 
-  .then(response => response.json())
+  .then(response =>
+    response.json()
+  )
 
   .then(data => {
 
     if (!data.success) {
 
       showError(
-        data.error || 'ไม่พบข้อมูล'
+        data.error ||
+        'ไม่พบข้อมูล'
       );
 
       return;
     }
 
 
-    // แสดงข้อมูล
+    // ------------------------------
+    // แสดงข้อมูลลูกค้า
+    // ------------------------------
 
-    document.getElementById('ref').textContent =
+    document.getElementById(
+      'ref'
+    ).textContent =
       data.ref;
 
-    document.getElementById('name').textContent =
+
+    document.getElementById(
+      'name'
+    ).textContent =
       data.name;
 
-    document.getElementById('slot').textContent =
+
+    document.getElementById(
+      'slot'
+    ).textContent =
       data.slot;
 
-    document.getElementById('month').textContent =
+
+    document.getElementById(
+      'month'
+    ).textContent =
       data.month;
 
-    document.getElementById('amount').textContent =
-      Number(data.amount).toLocaleString('th-TH') +
+
+    document.getElementById(
+      'amount'
+    ).textContent =
+      Number(data.amount)
+        .toLocaleString('th-TH') +
       ' บาท';
 
 
+    // ------------------------------
     // ซ่อน Loading
+    // ------------------------------
 
-    document.getElementById('loading').style.display =
+    document.getElementById(
+      'loading'
+    ).style.display =
       'none';
 
 
-    // แสดงข้อมูล
+    // ------------------------------
+    // แสดงข้อมูลลูกค้า
+    // ------------------------------
 
-    document.getElementById('data').style.display =
+    document.getElementById(
+      'data'
+    ).style.display =
       'block';
 
-    document.getElementById('paymentSection').style.display =
-  'block';
+
+    // ------------------------------
+    // แสดง QR
+    // ------------------------------
+
+    document.getElementById(
+      'qrSection'
+    ).style.display =
+      'block';
 
 
+    // ------------------------------
     // แสดงส่วนแนบสลิป
+    // ------------------------------
 
-    document.getElementById('paymentSection').style.display =
+    document.getElementById(
+      'paymentSection'
+    ).style.display =
       'block';
 
   })
@@ -343,14 +425,14 @@ if (!ref) {
 function uploadSlip() {
 
   const fileInput =
-    document.getElementById('slipFile');
+    document.getElementById(
+      'slipFile'
+    );
 
 
   const file =
     fileInput.files[0];
 
-
-  // ยังไม่ได้เลือกไฟล์
 
   if (!file) {
 
@@ -362,9 +444,12 @@ function uploadSlip() {
   }
 
 
-  // จำกัดขนาดไฟล์ 10 MB
+  // จำกัดขนาด 10 MB
 
-  if (file.size > 10 * 1024 * 1024) {
+  if (
+    file.size >
+    10 * 1024 * 1024
+  ) {
 
     showError(
       'ไฟล์มีขนาดใหญ่เกินไป กรุณาเลือกไฟล์ไม่เกิน 10 MB'
@@ -375,7 +460,9 @@ function uploadSlip() {
 
 
   const button =
-    document.getElementById('uploadBtn');
+    document.getElementById(
+      'uploadBtn'
+    );
 
 
   button.disabled = true;
@@ -394,30 +481,38 @@ function uploadSlip() {
       reader.result.split(',')[1];
 
 
-    fetch(API_URL, {
+    fetch(
+      API_URL,
+      {
 
-      method: 'POST',
+        method: 'POST',
 
-      headers: {
-        'Content-Type':
-          'text/plain;charset=utf-8'
-      },
+        headers: {
+          'Content-Type':
+            'text/plain;charset=utf-8'
+        },
 
-      body: JSON.stringify({
+        body: JSON.stringify({
 
-        ref: ref,
+          ref: ref,
 
-        fileName: file.name,
+          fileName:
+            file.name,
 
-        fileType: file.type,
+          fileType:
+            file.type,
 
-        fileBase64: base64
+          fileBase64:
+            base64
 
-      })
+        })
 
-    })
+      }
+    )
 
-    .then(response => response.json())
+    .then(response =>
+      response.json()
+    )
 
     .then(data => {
 
@@ -435,7 +530,8 @@ function uploadSlip() {
 
       document.getElementById(
         'paymentSection'
-      ).style.display = 'none';
+      ).style.display =
+        'none';
 
 
       // แสดงข้อความสำเร็จ
@@ -457,7 +553,8 @@ function uploadSlip() {
 
       console.error(error);
 
-      button.disabled = false;
+      button.disabled =
+        false;
 
       button.textContent =
         'ส่งหลักฐานการชำระเงิน';
@@ -473,7 +570,8 @@ function uploadSlip() {
 
   reader.onerror = function() {
 
-    button.disabled = false;
+    button.disabled =
+      false;
 
     button.textContent =
       'ส่งหลักฐานการชำระเงิน';
@@ -485,7 +583,9 @@ function uploadSlip() {
   };
 
 
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(
+    file
+  );
 
 }
 
@@ -498,17 +598,20 @@ function showError(message) {
 
   document.getElementById(
     'loading'
-  ).style.display = 'none';
+  ).style.display =
+    'none';
 
 
   document.getElementById(
     'error'
-  ).textContent = message;
+  ).textContent =
+    message;
 
 
   document.getElementById(
     'error'
-  ).style.display = 'block';
+  ).style.display =
+    'block';
 
 }
 
