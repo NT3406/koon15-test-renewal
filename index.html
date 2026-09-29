@@ -70,21 +70,40 @@
       margin-top: 20px;
     }
 
-    #confirmBtn {
-      width: 100%;
+    #paymentSection {
+      display: none;
       margin-top: 25px;
+    }
+
+    .payment-title {
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    #slipFile {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    #uploadBtn {
+      width: 100%;
+      margin-top: 15px;
       padding: 15px;
       border: none;
       border-radius: 12px;
-      background: #2563eb;
+      background: #16803c;
       color: white;
       font-size: 17px;
       font-weight: bold;
       cursor: pointer;
-      display: none;
     }
 
-    #confirmBtn:disabled {
+    #uploadBtn:disabled {
       opacity: 0.6;
       cursor: wait;
     }
@@ -118,6 +137,7 @@
       กำลังตรวจสอบข้อมูล...
     </div>
 
+    <!-- ข้อมูลลูกค้า -->
     <div id="data" style="display:none;">
 
       <div class="row">
@@ -147,40 +167,66 @@
 
     </div>
 
-    <div id="error" class="error" style="display:none;"></div>
 
-    <button
-      id="confirmBtn"
-      onclick="confirmRenewal()">
-      ยืนยันต่ออายุ
-    </button>
+    <!-- Error -->
+    <div id="error"
+         class="error"
+         style="display:none;">
+    </div>
 
-    <div id="success">
+
+    <!-- แนบสลิป -->
+    <div id="paymentSection">
+
+      <div class="payment-title">
+        📎 แนบหลักฐานการชำระเงิน
       </div>
+
+      <input
+        type="file"
+        id="slipFile"
+        accept="image/*,.pdf">
+
+      <button
+        id="uploadBtn"
+        onclick="uploadSlip()">
+        ส่งหลักฐานการชำระเงิน
+      </button>
+
+    </div>
+
+
+    <!-- สำเร็จ -->
+    <div id="success"></div>
 
   </div>
 
 </div>
+
 
 <script>
 
 const API_URL =
   'https://script.google.com/macros/s/AKfycbxcPRUNhcp83db0DB2o3fPWtyXW5ENa-IAsHdVPOX9LMS6rsPezfal3z3MZj1lTo-m8/exec';
 
+
 const params =
   new URLSearchParams(window.location.search);
+
 
 const ref =
   params.get('ref');
 
 
-// --------------------------------------------------
+// ==================================================
 // โหลดข้อมูลลูกค้า
-// --------------------------------------------------
+// ==================================================
 
 if (!ref) {
 
-  showError('ไม่พบรหัสอ้างอิงต่ออายุ');
+  showError(
+    'ไม่พบรหัสอ้างอิงต่ออายุ'
+  );
 
 } else {
 
@@ -203,6 +249,9 @@ if (!ref) {
       return;
     }
 
+
+    // แสดงข้อมูล
+
     document.getElementById('ref').textContent =
       data.ref;
 
@@ -219,111 +268,212 @@ if (!ref) {
       Number(data.amount).toLocaleString('th-TH') +
       ' บาท';
 
+
+    // ซ่อน Loading
+
     document.getElementById('loading').style.display =
       'none';
+
+
+    // แสดงข้อมูล
 
     document.getElementById('data').style.display =
       'block';
 
-    document.getElementById('confirmBtn').style.display =
+
+    // แสดงส่วนแนบสลิป
+
+    document.getElementById('paymentSection').style.display =
       'block';
 
   })
 
   .catch(error => {
+
+    console.error(error);
 
     showError(
       'ไม่สามารถเชื่อมต่อระบบได้'
     );
 
-    console.error(error);
-
   });
+
 }
 
 
-// --------------------------------------------------
-// ยืนยันต่ออายุ
-// --------------------------------------------------
+// ==================================================
+// ส่งสลิป
+// ==================================================
 
-function confirmRenewal() {
+function uploadSlip() {
+
+  const fileInput =
+    document.getElementById('slipFile');
+
+
+  const file =
+    fileInput.files[0];
+
+
+  // ยังไม่ได้เลือกไฟล์
+
+  if (!file) {
+
+    showError(
+      'กรุณาเลือกไฟล์หลักฐานการชำระเงิน'
+    );
+
+    return;
+  }
+
+
+  // จำกัดขนาดไฟล์ 10 MB
+
+  if (file.size > 10 * 1024 * 1024) {
+
+    showError(
+      'ไฟล์มีขนาดใหญ่เกินไป กรุณาเลือกไฟล์ไม่เกิน 10 MB'
+    );
+
+    return;
+  }
+
 
   const button =
-    document.getElementById('confirmBtn');
+    document.getElementById('uploadBtn');
+
 
   button.disabled = true;
 
   button.textContent =
-    'กำลังบันทึก...';
+    'กำลังส่งหลักฐาน...';
 
-  fetch(API_URL, {
 
-    method: 'POST',
+  const reader =
+    new FileReader();
 
-    headers: {
-      'Content-Type':
-        'text/plain;charset=utf-8'
-    },
 
-    body: JSON.stringify({
-      ref: ref
+  reader.onload = function() {
+
+    const base64 =
+      reader.result.split(',')[1];
+
+
+    fetch(API_URL, {
+
+      method: 'POST',
+
+      headers: {
+        'Content-Type':
+          'text/plain;charset=utf-8'
+      },
+
+      body: JSON.stringify({
+
+        ref: ref,
+
+        fileName: file.name,
+
+        fileType: file.type,
+
+        fileBase64: base64
+
+      })
+
     })
 
-  })
+    .then(response => response.json())
 
-  .then(response => response.json())
+    .then(data => {
 
-  .then(data => {
+      if (!data.success) {
 
-    if (!data.success) {
+        throw new Error(
+          data.error ||
+          'ส่งหลักฐานไม่สำเร็จ'
+        );
 
-      throw new Error(
-        data.error ||
-        'บันทึกไม่สำเร็จ'
+      }
+
+
+      // ซ่อนส่วนแนบสลิป
+
+      document.getElementById(
+        'paymentSection'
+      ).style.display = 'none';
+
+
+      // แสดงข้อความสำเร็จ
+
+      document.getElementById(
+        'success'
+      ).textContent =
+        '✅ ส่งหลักฐานการชำระเงินเรียบร้อยแล้ว';
+
+
+      document.getElementById(
+        'success'
+      ).style.display =
+        'block';
+
+    })
+
+    .catch(error => {
+
+      console.error(error);
+
+      button.disabled = false;
+
+      button.textContent =
+        'ส่งหลักฐานการชำระเงิน';
+
+      showError(
+        error.message
       );
 
-    }
+    });
 
-    button.style.display =
-      'none';
+  };
 
-    document.getElementById('success').textContent =
-      '✅ ยืนยันต่ออายุเรียบร้อยแล้ว';
 
-    document.getElementById('success').style.display =
-      'block';
-
-  })
-
-  .catch(error => {
+  reader.onerror = function() {
 
     button.disabled = false;
 
     button.textContent =
-      'ยืนยันต่ออายุ';
+      'ส่งหลักฐานการชำระเงิน';
 
     showError(
-      error.message
+      'ไม่สามารถอ่านไฟล์ได้'
     );
 
-  });
+  };
+
+
+  reader.readAsDataURL(file);
+
 }
 
 
-// --------------------------------------------------
+// ==================================================
 // แสดง Error
-// --------------------------------------------------
+// ==================================================
 
 function showError(message) {
 
-  document.getElementById('loading').style.display =
-    'none';
+  document.getElementById(
+    'loading'
+  ).style.display = 'none';
 
-  document.getElementById('error').textContent =
-    message;
 
-  document.getElementById('error').style.display =
-    'block';
+  document.getElementById(
+    'error'
+  ).textContent = message;
+
+
+  document.getElementById(
+    'error'
+  ).style.display = 'block';
 
 }
 
