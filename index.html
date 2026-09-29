@@ -69,6 +69,36 @@
       text-align: center;
       margin-top: 20px;
     }
+
+    #confirmBtn {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #2563eb;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+    }
+
+    #confirmBtn:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    #success {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      background: #eefbf3;
+      color: #16803c;
+      text-align: center;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -119,6 +149,15 @@
 
     <div id="error" class="error" style="display:none;"></div>
 
+    <button
+      id="confirmBtn"
+      onclick="confirmRenewal()">
+      ยืนยันต่ออายุ
+    </button>
+
+    <div id="success">
+      </div>
+
   </div>
 
 </div>
@@ -128,9 +167,16 @@
 const API_URL =
   'https://script.google.com/macros/s/AKfycbxcPRUNhcp83db0DB2o3fPWtyXW5ENa-IAsHdVPOX9LMS6rsPezfal3z3MZj1lTo-m8/exec';
 
-const params = new URLSearchParams(window.location.search);
+const params =
+  new URLSearchParams(window.location.search);
 
-const ref = params.get('ref');
+const ref =
+  params.get('ref');
+
+
+// --------------------------------------------------
+// โหลดข้อมูลลูกค้า
+// --------------------------------------------------
 
 if (!ref) {
 
@@ -138,45 +184,135 @@ if (!ref) {
 
 } else {
 
-  fetch(API_URL + '?ref=' + encodeURIComponent(ref))
-    .then(response => response.json())
-    .then(data => {
+  fetch(
+    API_URL +
+    '?ref=' +
+    encodeURIComponent(ref)
+  )
 
-      if (!data.success) {
-        showError(data.error || 'ไม่พบข้อมูล');
-        return;
-      }
+  .then(response => response.json())
 
-      document.getElementById('ref').textContent =
-        data.ref;
+  .then(data => {
 
-      document.getElementById('name').textContent =
-        data.name;
+    if (!data.success) {
 
-      document.getElementById('slot').textContent =
-        data.slot;
+      showError(
+        data.error || 'ไม่พบข้อมูล'
+      );
 
-      document.getElementById('month').textContent =
-        data.month;
+      return;
+    }
 
-      document.getElementById('amount').textContent =
-        Number(data.amount).toLocaleString('th-TH') + ' บาท';
+    document.getElementById('ref').textContent =
+      data.ref;
 
-      document.getElementById('loading').style.display =
-        'none';
+    document.getElementById('name').textContent =
+      data.name;
 
-      document.getElementById('data').style.display =
-        'block';
+    document.getElementById('slot').textContent =
+      data.slot;
 
-    })
-    .catch(error => {
+    document.getElementById('month').textContent =
+      data.month;
 
-      showError('ไม่สามารถเชื่อมต่อระบบได้');
+    document.getElementById('amount').textContent =
+      Number(data.amount).toLocaleString('th-TH') +
+      ' บาท';
 
-      console.error(error);
+    document.getElementById('loading').style.display =
+      'none';
 
-    });
+    document.getElementById('data').style.display =
+      'block';
+
+    document.getElementById('confirmBtn').style.display =
+      'block';
+
+  })
+
+  .catch(error => {
+
+    showError(
+      'ไม่สามารถเชื่อมต่อระบบได้'
+    );
+
+    console.error(error);
+
+  });
 }
+
+
+// --------------------------------------------------
+// ยืนยันต่ออายุ
+// --------------------------------------------------
+
+function confirmRenewal() {
+
+  const button =
+    document.getElementById('confirmBtn');
+
+  button.disabled = true;
+
+  button.textContent =
+    'กำลังบันทึก...';
+
+  fetch(API_URL, {
+
+    method: 'POST',
+
+    headers: {
+      'Content-Type':
+        'text/plain;charset=utf-8'
+    },
+
+    body: JSON.stringify({
+      ref: ref
+    })
+
+  })
+
+  .then(response => response.json())
+
+  .then(data => {
+
+    if (!data.success) {
+
+      throw new Error(
+        data.error ||
+        'บันทึกไม่สำเร็จ'
+      );
+
+    }
+
+    button.style.display =
+      'none';
+
+    document.getElementById('success').textContent =
+      '✅ ยืนยันต่ออายุเรียบร้อยแล้ว';
+
+    document.getElementById('success').style.display =
+      'block';
+
+  })
+
+  .catch(error => {
+
+    button.disabled = false;
+
+    button.textContent =
+      'ยืนยันต่ออายุ';
+
+    showError(
+      error.message
+    );
+
+  });
+}
+
+
+// --------------------------------------------------
+// แสดง Error
+// --------------------------------------------------
 
 function showError(message) {
 
@@ -188,6 +324,7 @@ function showError(message) {
 
   document.getElementById('error').style.display =
     'block';
+
 }
 
 </script>
