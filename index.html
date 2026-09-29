@@ -171,16 +171,12 @@
   ระบบต่ออายุที่จอดรถ
 </div>
 
-
 <!-- Loading -->
-
 <div id="loading" class="loading">
   กำลังตรวจสอบข้อมูล...
 </div>
 
-
 <!-- ข้อมูลลูกค้า -->
-
 <div id="data" style="display:none;">
 
   <div class="row">
@@ -210,18 +206,14 @@
 
 </div>
 
-
 <!-- Error -->
-
 <div
   id="error"
   class="error"
   style="display:none;">
 </div>
 
-
 <!-- QR ชำระเงิน -->
-
 <div id="qrSection">
 
   <div class="qr-title">
@@ -233,7 +225,7 @@
   </div>
 
   <img
-    src="qr-payment.jpg"
+    src="https://nt3406.github.io/koon15-test-renewal/qr-payment.jpg"
     alt="QR สำหรับชำระเงิน"
     class="qr-image"
   >
@@ -244,9 +236,7 @@
 
 </div>
 
-
 <!-- แนบสลิป -->
-
 <div id="paymentSection">
 
   <div class="payment-title">
@@ -267,9 +257,7 @@
 
 </div>
 
-
 <!-- สำเร็จ -->
-
 <div id="success"></div>
 ```
 
@@ -282,12 +270,10 @@
 const API_URL =
   'https://script.google.com/macros/s/AKfycbxcPRUNhcp83db0DB2o3fPWtyXW5ENa-IAsHdVPOX9LMS6rsPezfal3z3MZj1lTo-m8/exec';
 
-
 const params =
   new URLSearchParams(
     window.location.search
   );
-
 
 const ref =
   params.get('ref');
@@ -327,34 +313,27 @@ if (!ref) {
       return;
     }
 
-
-    // ------------------------------
     // แสดงข้อมูลลูกค้า
-    // ------------------------------
 
     document.getElementById(
       'ref'
     ).textContent =
       data.ref;
 
-
     document.getElementById(
       'name'
     ).textContent =
       data.name;
-
 
     document.getElementById(
       'slot'
     ).textContent =
       data.slot;
 
-
     document.getElementById(
       'month'
     ).textContent =
       data.month;
-
 
     document.getElementById(
       'amount'
@@ -364,9 +343,7 @@ if (!ref) {
       ' บาท';
 
 
-    // ------------------------------
     // ซ่อน Loading
-    // ------------------------------
 
     document.getElementById(
       'loading'
@@ -374,9 +351,7 @@ if (!ref) {
       'none';
 
 
-    // ------------------------------
-    // แสดงข้อมูลลูกค้า
-    // ------------------------------
+    // แสดงข้อมูล
 
     document.getElementById(
       'data'
@@ -384,9 +359,7 @@ if (!ref) {
       'block';
 
 
-    // ------------------------------
     // แสดง QR
-    // ------------------------------
 
     document.getElementById(
       'qrSection'
@@ -394,9 +367,7 @@ if (!ref) {
       'block';
 
 
-    // ------------------------------
     // แสดงส่วนแนบสลิป
-    // ------------------------------
 
     document.getElementById(
       'paymentSection'
@@ -428,7 +399,6 @@ function uploadSlip() {
     document.getElementById(
       'slipFile'
     );
-
 
   const file =
     fileInput.files[0];
@@ -464,8 +434,8 @@ function uploadSlip() {
       'uploadBtn'
     );
 
-
-  button.disabled = true;
+  button.disabled =
+    true;
 
   button.textContent =
     'กำลังส่งหลักฐาน...';
@@ -484,7 +454,6 @@ function uploadSlip() {
     fetch(
       API_URL,
       {
-
         method: 'POST',
 
         headers: {
@@ -601,12 +570,10 @@ function showError(message) {
   ).style.display =
     'none';
 
-
   document.getElementById(
     'error'
   ).textContent =
     message;
-
 
   document.getElementById(
     'error'
