@@ -151,7 +151,7 @@
 
 
     // ==================================================
-    // URL สำหรับ Koon15 Test Renewal
+    // URL สำหรับระบบต่ออายุ Koon15
     // ==================================================
 
     const renewalBackendUrl =
@@ -179,7 +179,23 @@
       try {
 
         // ==============================================
-        // 1. อ่านรหัสจาก URL
+        // 1. เริ่ม LIFF ก่อน
+        // ==============================================
+
+        status.innerText =
+          'กำลังเริ่มระบบ LINE...';
+
+
+        await liff.init({
+
+          liffId:
+            '2011211599-0JqJ9GVy'
+
+        });
+
+
+        // ==============================================
+        // 2. อ่านรหัสจาก URL หลัง LIFF init
         // ==============================================
 
         const params =
@@ -204,7 +220,7 @@
 
 
         // ==============================================
-        // 2. ดึงรหัสที่เก็บไว้
+        // 3. ดึงรหัสที่เก็บไว้
         // ==============================================
 
         renewalCode =
@@ -222,18 +238,6 @@
           return;
 
         }
-
-
-        // ==============================================
-        // 3. เริ่ม LIFF
-        // ==============================================
-
-        await liff.init({
-
-          liffId:
-            '2011211599-0JqJ9GVy'
-
-        });
 
 
         // ==============================================
@@ -296,7 +300,8 @@
           await fetch(
 
             renewalBackendUrl +
-            '?ref=' +
+            '?action=getRenewalData' +
+            '&code=' +
             encodeURIComponent(renewalCode)
 
           );
@@ -332,33 +337,35 @@
         document.getElementById(
           'renewalCode'
         ).innerText =
-          result.ref;
+          result.code || result.ref || renewalCode;
 
 
         document.getElementById(
           'customerName'
         ).innerText =
-          result.name;
+          result.name || '';
 
 
         document.getElementById(
           'parkingSlot'
         ).innerText =
-          result.slot;
+          result.slot || '';
 
 
         document.getElementById(
           'renewalMonth'
         ).innerText =
-          result.month;
+          result.month || '';
 
 
         document.getElementById(
           'renewalAmount'
         ).innerText =
-          Number(result.amount)
-            .toLocaleString('th-TH') +
-          ' บาท';
+          result.amount
+            ? Number(result.amount)
+                .toLocaleString('th-TH') +
+              ' บาท'
+            : '';
 
 
         document.getElementById(
