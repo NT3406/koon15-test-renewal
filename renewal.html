@@ -9,7 +9,11 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 
-<body>
+<body style="
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 40px 20px;
+">
 
   <h2>Koon15 ต่ออายุที่จอดรถ</h2>
 
@@ -24,17 +28,85 @@
 
       try {
 
+        // 1. เริ่ม LIFF
         await liff.init({
           liffId: '2011211599-0JqJ9GVy'
         });
 
         status.innerText =
-          'LIFF เริ่มต้นสำเร็จ';
+          '✓ LIFF เริ่มต้นสำเร็จ';
+
+        // 2. อ่านรหัสจาก URL
+        const params =
+          new URLSearchParams(
+            window.location.search
+          );
+
+        const renewalCode =
+          params.get('code');
+
+        if (!renewalCode) {
+
+          status.innerText =
+            '❌ ไม่พบรหัสต่ออายุ\n\n' +
+            'กรุณาเปิดจากลิงก์ที่ Koon15 ส่งให้ค่ะ';
+
+          return;
+        }
+
+        // 3. ตรวจสอบ Login
+        if (!liff.isLoggedIn()) {
+
+          status.innerText =
+            'กำลังเข้าสู่ระบบ LINE...';
+
+          liff.login();
+
+          return;
+        }
+
+        // 4. ดึงข้อมูล LINE
+        status.innerText =
+          'กำลังตรวจสอบข้อมูล LINE...';
+
+        const profile =
+          await liff.getProfile();
+
+        // 5. ส่งข้อมูลไป Apps Script
+        status.innerText =
+          'กำลังบันทึกข้อมูล...';
+
+        const backendUrl =
+          'https://script.google.com/macros/s/AKfycbxOxtTc9SL07f2u2R_vLF0e91oHCH_uIQ8dcyAYWytFYD8bwAJ7RS94gHIAnh88l-s3DQ/exec';
+
+        const response =
+          await fetch(
+            backendUrl +
+            '?action=saveLineUserId' +
+            '&code=' +
+            encodeURIComponent(renewalCode) +
+            '&userId=' +
+            encodeURIComponent(profile.userId)
+          );
+
+        const result =
+          await response.text();
+
+        status.innerText =
+          '✓ เชื่อมต่อ LINE สำเร็จ\n\n' +
+          'รหัสต่ออายุ: ' +
+          renewalCode +
+          '\n\n' +
+          'ชื่อ LINE: ' +
+          profile.displayName +
+          '\n\n' +
+          'ผลการบันทึก:\n' +
+          result;
 
       } catch (error) {
 
         status.innerText =
-          '❌ LIFF ERROR\n\n' +
+          '❌ เกิดข้อผิดพลาด\n\n' +
           error.message;
 
         console.error(error);
