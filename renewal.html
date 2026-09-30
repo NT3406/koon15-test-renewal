@@ -23,22 +23,23 @@
 
     <hr>
 
-    <p>
-      <strong>รหัสต่ออายุ</strong>
-    </p>
+    <p><strong>รหัสต่ออายุ</strong></p>
     <p id="renewalCode"></p>
 
-    <p>
-      <strong>ชื่อผู้เช่า</strong>
-    </p>
+    <p><strong>ชื่อผู้เช่า</strong></p>
     <p id="customerName"></p>
 
-    <p>
-      <strong>ช่องจอดรถ</strong>
-    </p>
+    <p><strong>ช่องจอดรถ</strong></p>
     <p id="parkingSlot"></p>
 
+    <p><strong>รอบเดือน</strong></p>
+    <p id="renewalMonth"></p>
+
+    <p><strong>ค่าบริการ</strong></p>
+    <p id="renewalAmount"></p>
+
   </div>
+
 
   <script>
 
@@ -49,7 +50,10 @@
 
       try {
 
+        // ==================================================
         // 1. อ่านรหัสต่ออายุจาก URL
+        // ==================================================
+
         const params =
           new URLSearchParams(
             window.location.search
@@ -58,7 +62,6 @@
         const urlCode =
           params.get('code');
 
-        // 2. เก็บรหัสก่อนเข้า LINE Login
         if (urlCode) {
 
           sessionStorage.setItem(
@@ -68,7 +71,11 @@
 
         }
 
-        // 3. ดึงรหัสที่เก็บไว้
+
+        // ==================================================
+        // 2. ดึงรหัสต่ออายุที่เก็บไว้
+        // ==================================================
+
         const renewalCode =
           sessionStorage.getItem(
             'koon15RenewalCode'
@@ -84,7 +91,11 @@
 
         }
 
-        // 4. เริ่ม LIFF
+
+        // ==================================================
+        // 3. เริ่ม LIFF
+        // ==================================================
+
         await liff.init({
 
           liffId:
@@ -92,7 +103,11 @@
 
         });
 
-        // 5. Login LINE
+
+        // ==================================================
+        // 4. Login LINE
+        // ==================================================
+
         if (!liff.isLoggedIn()) {
 
           status.innerText =
@@ -104,23 +119,33 @@
 
         }
 
-        // 6. อ่านข้อมูล LINE
+
+        // ==================================================
+        // 5. อ่านข้อมูล LINE
+        // ==================================================
+
         status.innerText =
-          'กำลังตรวจสอบข้อมูล...';
+          'กำลังตรวจสอบข้อมูล LINE...';
 
         const profile =
           await liff.getProfile();
 
-        // 7. บันทึก LINE User ID ลงระบบหลัก
+
+        // ==================================================
+        // 6. Backend สำหรับบันทึก LINE User ID
+        // ==================================================
+
+        const saveBackendUrl =
+          'https://script.google.com/macros/s/AKfycbxOxtTc9SL07f2u2R_vLF0e91oHCH_uIQ8dcyAYWytFYD8bwAJ7RS94gHIAnh88l-s3DQ/exec';
+
+
         status.innerText =
           'กำลังเชื่อมต่อข้อมูล...';
 
-        const backendUrl =
-          'https://script.google.com/macros/s/AKfycbxOxtTc9SL07f2u2R_vLF0e91oHCH_uIQ8dcyAYWytFYD8bwAJ7RS94gHIAnh88l-s3DQ/exec';
 
         await fetch(
 
-          backendUrl +
+          saveBackendUrl +
           '?action=saveLineUserId' +
           '&code=' +
           encodeURIComponent(renewalCode) +
@@ -129,56 +154,95 @@
 
         );
 
-        // 8. ขอข้อมูลลูกค้าจากระบบหลัก
+
+        // ==================================================
+        // 7. Backend Koon15 Test Renewal
+        //    ใช้ดึงข้อมูลจากชีต Renewal Test
+        // ==================================================
+
+        const renewalBackendUrl =
+          'https://script.google.com/macros/s/AKfycbxcPRUNhcp83db0DB2o3fPWtyXW5ENa-IAsHdVPOX9LMS6rsPezfal3z3MZj1lTo-m8/exec';
+
+
         status.innerText =
           'กำลังโหลดข้อมูลการต่ออายุ...';
+
 
         const response =
           await fetch(
 
-            backendUrl +
-            '?action=getRenewalData' +
-            '&code=' +
+            renewalBackendUrl +
+            '?ref=' +
             encodeURIComponent(renewalCode)
 
           );
 
+
         const result =
           await response.json();
 
-        // 9. ตรวจสอบผลลัพธ์
+
+        // ==================================================
+        // 8. ตรวจสอบผลลัพธ์
+        // ==================================================
+
         if (!result.success) {
 
           throw new Error(
+
             result.error ||
-            'ไม่สามารถโหลดข้อมูลได้'
+            'ไม่สามารถโหลดข้อมูลการต่ออายุได้'
+
           );
 
         }
 
-        // 10. แสดงข้อมูล
+
+        // ==================================================
+        // 9. แสดงข้อมูล
+        // ==================================================
+
         document.getElementById(
           'renewalCode'
         ).innerText =
-          result.code;
+          result.ref;
+
 
         document.getElementById(
           'customerName'
         ).innerText =
           result.name;
 
+
         document.getElementById(
           'parkingSlot'
         ).innerText =
           result.slot;
+
+
+        document.getElementById(
+          'renewalMonth'
+        ).innerText =
+          result.month;
+
+
+        document.getElementById(
+          'renewalAmount'
+        ).innerText =
+          Number(result.amount)
+            .toLocaleString('th-TH') +
+          ' บาท';
+
 
         document.getElementById(
           'customerData'
         ).style.display =
           'block';
 
+
         status.innerText =
           '✓ ตรวจสอบข้อมูลสำเร็จ';
+
 
       } catch (error) {
 
@@ -191,6 +255,7 @@
       }
 
     }
+
 
     main();
 
