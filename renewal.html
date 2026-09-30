@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <title>Koon15 ต่ออายุที่จอดรถ</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+
+<body>
+
+  <h2>Koon15 ต่ออายุที่จอดรถ</h2>
+
+  <p id="status">กำลังเริ่มระบบ...</p>
+
+  <script>
+
+    async function main() {
+
+      const status =
+        document.getElementById('status');
+
+      try {
+
+        await liff.init({
+          liffId: '2011211599-0JqJ9GVy'
+        });
+
+        status.innerText =
+          'LIFF เริ่มต้นสำเร็จ';
+
+      } catch (error) {
+
+        status.innerText =
+          '❌ LIFF ERROR\n\n' +
+          error.message;
+
+        console.error(error);
+
+      }
+
+    }
+
+    main();
+
+  </script>
+
+</body>
+</html>
