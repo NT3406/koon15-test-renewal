@@ -1,845 +1,1001 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
-  <title>Koon15 ต่ออายุที่จอดรถ</title>
+  <title>Koon15 | ต่ออายุที่จอดรถ</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
+  <style>
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f7f8;
+      color: #222;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans Thai",
+        Arial,
+        sans-serif;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    /* =========================
+       Header
+    ========================= */
+
+    .header {
+      text-align: center;
+      padding: 12px 0 22px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #222;
+    }
+
+    .subtitle {
+      margin-top: 3px;
+      font-size: 16px;
+      color: #666;
+    }
+
+    /* =========================
+       Status
+    ========================= */
+
+    #status {
+      margin: 0 0 14px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      white-space: pre-line;
+    }
+
+    /* =========================
+       Card
+    ========================= */
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 18px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #222;
+    }
+
+    /* =========================
+       Customer information
+    ========================= */
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 15px;
+      padding: 13px 0;
+      border-bottom: 1px solid #eeeeee;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      flex: 0 0 auto;
+      color: #777;
+      font-size: 15px;
+    }
+
+    .info-value {
+      text-align: right;
+      font-size: 15px;
+      font-weight: 600;
+      color: #222;
+      word-break: break-word;
+    }
+
+    .amount-box {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 14px;
+      background: #f1f8f4;
+      text-align: center;
+    }
+
+    .amount-label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 3px;
+    }
+
+    .amount {
+      font-size: 30px;
+      font-weight: 800;
+      color: #06a94d;
+      letter-spacing: -0.5px;
+    }
+
+    /* =========================
+       Payment
+    ========================= */
+
+    .payment-text {
+      margin: -5px 0 15px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .qr-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 4px 0 8px;
+    }
+
+    .qr-code {
+      width: 230px;
+      max-width: 75vw;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .qr-note {
+      text-align: center;
+      margin: 8px 0 0;
+      font-size: 13px;
+      color: #777;
+    }
+
+    /* =========================
+       Upload
+    ========================= */
+
+    .upload-title {
+      margin: 0 0 5px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .upload-description {
+      margin: 0 0 15px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .file-input-wrapper {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #dddddd;
+      border-radius: 12px;
+      background: #fafafa;
+      font-size: 14px;
+      color: #444;
+    }
+
+    #fileName {
+      margin: 8px 0 14px;
+      font-size: 13px;
+      color: #777;
+      word-break: break-word;
+    }
+
+    /* =========================
+       Button
+    ========================= */
+
+    #submitButton {
+      width: 100%;
+      min-height: 52px;
+      padding: 13px 16px;
+      border: none;
+      border-radius: 13px;
+      background: #06c755;
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(6, 199, 85, 0.18);
+    }
+
+    #submitButton:active {
+      transform: scale(0.99);
+    }
+
+    #submitButton:disabled {
+      cursor: default;
+      box-shadow: none;
+    }
+
+    /* =========================
+       Upload status
+    ========================= */
+
+    #uploadStatus {
+      margin: 14px 0 0;
+      text-align: center;
+      font-size: 14px;
+      white-space: pre-line;
+      color: #555;
+    }
+
+    /* =========================
+       Footer
+    ========================= */
+
+    .footer {
+      padding: 8px 0 0;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* =========================
+       Small iPhone
+    ========================= */
+
+    @media (max-width: 375px) {
+
+      .container {
+        padding-left: 13px;
+        padding-right: 13px;
+      }
+
+      .card {
+        padding: 17px;
+        border-radius: 16px;
+      }
+
+      .logo {
+        font-size: 25px;
+      }
+
+      .info-label,
+      .info-value {
+        font-size: 14px;
+      }
+
+      .amount {
+        font-size: 28px;
+      }
+
+      .qr-code {
+        width: 210px;
+      }
+
+    }
+
+  </style>
 </head>
 
+<body>
 
-<body style="
-  font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 25px 15px;
-  max-width: 500px;
-  margin: auto;
-">
+  <div class="container">
 
+    <!-- =========================
+         Header
+    ========================= -->
 
-<h2>Koon15 ต่ออายุที่จอดรถ</h2>
+    <div class="header">
 
+      <div class="logo">
+        🚗 Koon15
+      </div>
 
-<p id="status">
-  กำลังเริ่มระบบ...
-</p>
+      <div class="subtitle">
+        ต่ออายุที่จอดรถรายเดือน
+      </div>
 
-
-<!-- ================================================= -->
-<!-- DEBUG -->
-<!-- ================================================= -->
-
-<div
-  id="debugBox"
-  style="
-    display:none;
-    margin-top:20px;
-    padding:15px;
-    background:#fff3cd;
-    border:1px solid #ffe69c;
-    border-radius:10px;
-    text-align:left;
-    font-size:13px;
-    word-break:break-all;
-  "
->
-
-  <strong>ข้อมูลตรวจสอบ LIFF</strong>
-
-  <p>
-    URL หลังเริ่ม LIFF:
-  </p>
-
-  <div id="debugUrl"></div>
-
-  <p>
-    Query String:
-  </p>
-
-  <div id="debugQuery"></div>
-
-  <p>
-    code:
-  </p>
-
-  <div id="debugCode"></div>
-
-  <p>
-    ref:
-  </p>
-
-  <div id="debugRef"></div>
-
-  <p>
-    liff.state:
-  </p>
-
-  <div id="debugState"></div>
-
-</div>
+    </div>
 
 
-<!-- ================================================= -->
-<!-- CUSTOMER DATA -->
-<!-- ================================================= -->
+    <!-- =========================
+         Status
+    ========================= -->
 
-<div
-  id="customerData"
-  style="display:none;"
->
-
-  <hr>
-
-  <p>
-    <strong>รหัสต่ออายุ</strong>
-  </p>
-
-  <p id="renewalCode"></p>
-
-
-  <p>
-    <strong>ชื่อผู้เช่า</strong>
-  </p>
-
-  <p id="customerName"></p>
-
-
-  <p>
-    <strong>ช่องจอดรถ</strong>
-  </p>
-
-  <p id="parkingSlot"></p>
-
-
-  <p>
-    <strong>รอบเดือน</strong>
-  </p>
-
-  <p id="renewalMonth"></p>
-
-
-  <p>
-    <strong>ค่าบริการ</strong>
-  </p>
-
-  <p
-    id="renewalAmount"
-    style="
-      font-size:24px;
-      font-weight:bold;
-    "
-  >
-  </p>
-
-
-  <!-- ================================================= -->
-  <!-- PAYMENT -->
-  <!-- ================================================= -->
-
-  <div
-    style="
-      margin-top:30px;
-      padding:20px;
-      border:1px solid #ddd;
-      border-radius:15px;
-    "
-  >
-
-    <h3>
-      ชำระค่าต่ออายุ
-    </h3>
-
-    <p>
-      กรุณาชำระค่าบริการตามยอดด้านบน
+    <p id="status">
+      กำลังเริ่มระบบ...
     </p>
 
 
-    <img
-      src="https://nt3406.github.io/koon15-test-renewal/qr-payment.jpg"
-      alt="QR Code"
-      style="
-        width:260px;
-        max-width:80%;
-      "
-    >
+    <!-- =========================
+         Customer Data
+    ========================= -->
+
+    <div id="customerData" style="display:none;">
+
+      <div class="card">
+
+        <h2 class="card-title">
+          📋 ข้อมูลการต่ออายุ
+        </h2>
 
 
-    <hr
-      style="
-        margin:25px 0;
-      "
-    >
+        <div class="info-row">
+
+          <div class="info-label">
+            🔖 รหัสต่ออายุ
+          </div>
+
+          <div
+            class="info-value"
+            id="renewalCode"
+          ></div>
+
+        </div>
 
 
-    <h3>
-      แนบหลักฐานการชำระเงิน
-    </h3>
+        <div class="info-row">
+
+          <div class="info-label">
+            👤 ผู้เช่า
+          </div>
+
+          <div
+            class="info-value"
+            id="customerName"
+          ></div>
+
+        </div>
 
 
-    <input
-      type="file"
-      id="slipFile"
-      accept="image/*,.pdf"
-      style="
-        width:100%;
-        margin:15px 0;
-      "
-    >
+        <div class="info-row">
+
+          <div class="info-label">
+            🅿️ ช่องจอด
+          </div>
+
+          <div
+            class="info-value"
+            id="parkingSlot"
+          ></div>
+
+        </div>
 
 
-    <p
-      id="fileName"
-      style="
-        font-size:14px;
-        color:#666;
-      "
-    >
-    </p>
+        <div class="info-row">
+
+          <div class="info-label">
+            📅 รอบเดือน
+          </div>
+
+          <div
+            class="info-value"
+            id="renewalMonth"
+          ></div>
+
+        </div>
 
 
-    <button
-      id="submitButton"
-      onclick="submitSlip()"
-      style="
-        width:100%;
-        padding:14px;
-        border:none;
-        border-radius:10px;
-        background:#06C755;
-        color:white;
-        font-size:17px;
-        font-weight:bold;
-      "
-    >
-      ส่งหลักฐานการชำระเงิน
-    </button>
+        <div class="amount-box">
+
+          <div class="amount-label">
+            💰 ค่าบริการต่ออายุ
+          </div>
+
+          <div
+            class="amount"
+            id="renewalAmount"
+          ></div>
+
+        </div>
+
+      </div>
 
 
-    <p
-      id="uploadStatus"
-      style="
-        margin-top:15px;
-        white-space:pre-line;
-      "
-    >
-    </p>
+      <!-- =========================
+           Payment
+      ========================= -->
+
+      <div class="card">
+
+        <h2 class="card-title">
+          💳 ชำระค่าต่ออายุ
+        </h2>
+
+        <p class="payment-text">
+          กรุณาชำระค่าบริการตามยอดด้านบน
+        </p>
+
+
+        <div class="qr-wrapper">
+
+          <img
+            src="https://nt3406.github.io/koon15-test-renewal/qr-payment.jpg"
+            alt="QR Code สำหรับชำระเงิน"
+            class="qr-code"
+          >
+
+        </div>
+
+
+        <p class="qr-note">
+          📱 สแกน QR Code เพื่อชำระเงิน
+        </p>
+
+      </div>
+
+
+      <!-- =========================
+           Upload Slip
+      ========================= -->
+
+      <div class="card">
+
+        <h2 class="upload-title">
+          📎 แนบหลักฐานการชำระเงิน
+        </h2>
+
+        <p class="upload-description">
+          กรุณาเลือกรูปสลิปการโอนเงินจากโทรศัพท์ของคุณ
+        </p>
+
+
+        <div class="file-input-wrapper">
+
+          <input
+            type="file"
+            id="slipFile"
+            accept="image/*,.pdf"
+          >
+
+        </div>
+
+
+        <p id="fileName"></p>
+
+
+        <button
+          id="submitButton"
+          onclick="submitSlip()"
+        >
+          🟢 ส่งหลักฐานการชำระเงิน
+        </button>
+
+
+        <p id="uploadStatus"></p>
+
+      </div>
+
+
+      <div class="footer">
+        Koon15 Parking · ขอบคุณที่ใช้บริการค่ะ 🙏
+      </div>
+
+    </div>
 
   </div>
 
-</div>
 
+  <script>
 
-<script>
+    // ==================================================
+    // Production Backend
+    // ==================================================
 
+    const saveBackendUrl =
+      'https://script.google.com/macros/s/AKfycbxOxtTc9SL07f2u2R_vLF0e91oHCH_uIQ8dcyAYWytFYD8bwAJ7RS94gHIAnh88l-s3DQ/exec';
 
-// =====================================================
-// PRODUCTION BACKEND
-// =====================================================
 
-const backendUrl =
-  'https://script.google.com/macros/s/AKfycbxOxtTc9SL07f2u2R_vLF0e91oHCH_uIQ8dcyAYWytFYD8bwAJ7RS94gHIAnh88l-s3DQ/exec';
+    const renewalBackendUrl =
+      'https://script.google.com/macros/s/AKfycbxOxtTc9SL07f2u2R_vLF0e91oHCH_uIQ8dcyAYWytFYD8bwAJ7RS94gHIAnh88l-s3DQ/exec';
 
 
-// =====================================================
-// LIFF ID
-// =====================================================
+    // ==================================================
+    // ตัวแปร
+    // ==================================================
 
-const LIFF_ID =
-  '2011211599-0JqJ9GVy';
+    let renewalCode = '';
+    let renewalResult = null;
 
 
-// =====================================================
-// ตัวแปร
-// =====================================================
+    // ==================================================
+    // เริ่มระบบ
+    // ==================================================
 
-let renewalCode = '';
+    async function main() {
 
+      const status =
+        document.getElementById('status');
 
-// =====================================================
-// DEBUG FUNCTION
-// =====================================================
 
-function showDebug() {
+      try {
 
-  document.getElementById(
-    'debugBox'
-  ).style.display = 'block';
+        // ==============================================
+        // 1. อ่านรหัสจาก URL
+        // ==============================================
 
-
-  document.getElementById(
-    'debugUrl'
-  ).innerText =
-    window.location.href;
-
-
-  document.getElementById(
-    'debugQuery'
-  ).innerText =
-    window.location.search || '(ไม่มี)';
-
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-
-  document.getElementById(
-    'debugCode'
-  ).innerText =
-    params.get('code') || '(ไม่มี)';
-
-
-  document.getElementById(
-    'debugRef'
-  ).innerText =
-    params.get('ref') || '(ไม่มี)';
-
-
-  document.getElementById(
-    'debugState'
-  ).innerText =
-    params.get('liff.state') || '(ไม่มี)';
-
-}
-
-
-// =====================================================
-// หา Code
-// =====================================================
-
-function getRenewalCode() {
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-
-  const code =
-    params.get('code');
-
-
-  if (code) {
-    return code;
-  }
-
-
-  const ref =
-    params.get('ref');
-
-
-  if (ref) {
-    return ref;
-  }
-
-
-  const saved =
-    sessionStorage.getItem(
-      'koon15RenewalCode'
-    );
-
-
-  if (saved) {
-    return saved;
-  }
-
-
-  return '';
-
-}
-
-
-// =====================================================
-// MAIN
-// =====================================================
-
-async function main() {
-
-  const status =
-    document.getElementById(
-      'status'
-    );
-
-
-  try {
-
-
-    // -------------------------------------------------
-    // 1. LIFF INIT
-    // -------------------------------------------------
-
-    status.innerText =
-      'กำลังเริ่มระบบ LINE...';
-
-
-    await liff.init({
-
-      liffId:
-        LIFF_ID
-
-    });
-
-
-    // -------------------------------------------------
-    // 2. แสดงข้อมูล URL ที่ LINE ส่งมา
-    // -------------------------------------------------
-
-    showDebug();
-
-
-    // -------------------------------------------------
-    // 3. อ่าน Code หลัง LIFF INIT
-    // -------------------------------------------------
-
-    renewalCode =
-      getRenewalCode();
-
-
-    document.getElementById(
-      'debugCode'
-    ).innerText =
-      renewalCode || '(ไม่พบ code หลัง LIFF init)';
-
-
-    // -------------------------------------------------
-    // 4. ตรวจ Code
-    // -------------------------------------------------
-
-    if (!renewalCode) {
-
-      status.innerText =
-        '❌ ไม่พบรหัสต่ออายุ';
-
-
-      return;
-
-    }
-
-
-    // -------------------------------------------------
-    // 5. เก็บ Code
-    // -------------------------------------------------
-
-    sessionStorage.setItem(
-      'koon15RenewalCode',
-      renewalCode
-    );
-
-
-    // -------------------------------------------------
-    // 6. LOGIN
-    // -------------------------------------------------
-
-    if (!liff.isLoggedIn()) {
-
-      status.innerText =
-        'กำลังเข้าสู่ระบบ LINE...';
-
-
-      liff.login();
-
-
-      return;
-
-    }
-
-
-    // -------------------------------------------------
-    // 7. PROFILE
-    // -------------------------------------------------
-
-    status.innerText =
-      'กำลังเชื่อมต่อข้อมูล LINE...';
-
-
-    const profile =
-      await liff.getProfile();
-
-
-    // -------------------------------------------------
-    // 8. SAVE LINE USER ID
-    // -------------------------------------------------
-
-    await fetch(
-
-      backendUrl +
-      '?action=saveLineUserId' +
-      '&code=' +
-      encodeURIComponent(
-        renewalCode
-      ) +
-      '&userId=' +
-      encodeURIComponent(
-        profile.userId
-      )
-
-    );
-
-
-    // -------------------------------------------------
-    // 9. GET RENEWAL DATA
-    // -------------------------------------------------
-
-    status.innerText =
-      'กำลังโหลดข้อมูลการต่ออายุ...';
-
-
-    const response =
-      await fetch(
-
-        backendUrl +
-        '?action=getRenewalData' +
-        '&code=' +
-        encodeURIComponent(
-          renewalCode
-        )
-
-      );
-
-
-    const result =
-      await response.json();
-
-
-    // -------------------------------------------------
-    // 10. ตรวจผล
-    // -------------------------------------------------
-
-    if (!result.success) {
-
-      throw new Error(
-
-        result.error ||
-        'ไม่สามารถโหลดข้อมูลได้'
-
-      );
-
-    }
-
-
-    // -------------------------------------------------
-    // 11. แสดงข้อมูล
-    // -------------------------------------------------
-
-    document.getElementById(
-      'renewalCode'
-    ).innerText =
-      result.code ||
-      renewalCode;
-
-
-    document.getElementById(
-      'customerName'
-    ).innerText =
-      result.name || '';
-
-
-    document.getElementById(
-      'parkingSlot'
-    ).innerText =
-      result.slot || '';
-
-
-    document.getElementById(
-      'renewalMonth'
-    ).innerText =
-      result.month || '';
-
-
-    if (
-      result.amount !== undefined &&
-      result.amount !== null &&
-      result.amount !== ''
-    ) {
-
-      document.getElementById(
-        'renewalAmount'
-      ).innerText =
-
-        Number(
-          result.amount
-        ).toLocaleString(
-          'th-TH'
-        ) +
-        ' บาท';
-
-    }
-
-
-    document.getElementById(
-      'customerData'
-    ).style.display =
-      'block';
-
-
-    status.innerText =
-      '✓ ตรวจสอบข้อมูลสำเร็จ';
-
-
-  } catch (error) {
-
-
-    console.error(error);
-
-
-    showDebug();
-
-
-    status.innerText =
-      '❌ เกิดข้อผิดพลาด\n\n' +
-      error.message;
-
-  }
-
-}
-
-
-// =====================================================
-// FILE NAME
-// =====================================================
-
-document
-  .getElementById(
-    'slipFile'
-  )
-  .addEventListener(
-    'change',
-    function() {
-
-
-      const file =
-        this.files[0];
-
-
-      document.getElementById(
-        'fileName'
-      ).innerText =
-        file
-          ? 'ไฟล์ที่เลือก: ' + file.name
-          : '';
-
-    }
-  );
-
-
-// =====================================================
-// FILE → BASE64
-// =====================================================
-
-function fileToBase64(file) {
-
-  return new Promise(
-
-    (
-      resolve,
-      reject
-    ) => {
-
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function() {
-
-          resolve(
-            reader.result.split(',')[1]
+        const params =
+          new URLSearchParams(
+            window.location.search
           );
 
-        };
+
+        const urlCode =
+          params.get('code') ||
+          params.get('ref');
 
 
-      reader.onerror =
-        reject;
+        if (urlCode) {
 
-
-      reader.readAsDataURL(
-        file
-      );
-
-    }
-
-  );
-
-}
-
-
-// =====================================================
-// SUBMIT SLIP
-// =====================================================
-
-async function submitSlip() {
-
-
-  const file =
-    document.getElementById(
-      'slipFile'
-    ).files[0];
-
-
-  const button =
-    document.getElementById(
-      'submitButton'
-    );
-
-
-  const status =
-    document.getElementById(
-      'uploadStatus'
-    );
-
-
-  if (!file) {
-
-    status.innerText =
-      '❌ กรุณาเลือกไฟล์สลิปก่อนค่ะ';
-
-    return;
-
-  }
-
-
-  if (
-    file.size >
-    10 * 1024 * 1024
-  ) {
-
-    status.innerText =
-      '❌ ไฟล์มีขนาดใหญ่เกิน 10 MB';
-
-    return;
-
-  }
-
-
-  try {
-
-
-    button.disabled =
-      true;
-
-
-    status.innerText =
-      'กำลังส่งหลักฐานการชำระเงิน...';
-
-
-    const fileBase64 =
-      await fileToBase64(
-        file
-      );
-
-
-    const response =
-      await fetch(
-
-        backendUrl,
-
-        {
-
-          method:
-            'POST',
-
-          headers: {
-
-            'Content-Type':
-              'text/plain;charset=utf-8'
-
-          },
-
-          body:
-            JSON.stringify({
-
-              ref:
-                renewalCode,
-
-              fileBase64:
-                fileBase64,
-
-              fileType:
-                file.type,
-
-              fileName:
-                file.name
-
-            })
+          sessionStorage.setItem(
+            'koon15RenewalCode',
+            urlCode
+          );
 
         }
 
+
+        // ==============================================
+        // 2. ดึงรหัสที่เก็บไว้
+        // ==============================================
+
+        renewalCode =
+          sessionStorage.getItem(
+            'koon15RenewalCode'
+          );
+
+
+        if (!renewalCode) {
+
+          status.innerText =
+            '❌ ไม่พบรหัสต่ออายุ\n\n' +
+            'กรุณาเปิดจากลิงก์ที่ Koon15 ส่งให้ค่ะ';
+
+          return;
+
+        }
+
+
+        // ==============================================
+        // 3. เริ่ม LIFF
+        // ==============================================
+
+        await liff.init({
+
+          liffId:
+            '2011211599-0JqJ9GVy'
+
+        });
+
+
+        // ==============================================
+        // 4. Login LINE
+        // ==============================================
+
+        if (!liff.isLoggedIn()) {
+
+          status.innerText =
+            'กำลังเข้าสู่ระบบ LINE...';
+
+          liff.login();
+
+          return;
+
+        }
+
+
+        // ==============================================
+        // 5. อ่าน LINE User ID
+        // ==============================================
+
+        status.innerText =
+          'กำลังตรวจสอบข้อมูล LINE...';
+
+
+        const profile =
+          await liff.getProfile();
+
+
+        // ==============================================
+        // 6. บันทึก LINE User ID
+        // ==============================================
+
+        status.innerText =
+          'กำลังเชื่อมต่อข้อมูล...';
+
+
+        await fetch(
+
+          saveBackendUrl +
+          '?action=saveLineUserId' +
+          '&code=' +
+          encodeURIComponent(renewalCode) +
+          '&userId=' +
+          encodeURIComponent(profile.userId)
+
+        );
+
+
+        // ==============================================
+        // 7. ดึงข้อมูลการต่ออายุ
+        // ==============================================
+
+        status.innerText =
+          'กำลังโหลดข้อมูลการต่ออายุ...';
+
+
+        const response =
+          await fetch(
+
+            renewalBackendUrl +
+            '?ref=' +
+            encodeURIComponent(renewalCode)
+
+          );
+
+
+        const result =
+          await response.json();
+
+
+        // ==============================================
+        // 8. ตรวจสอบผลลัพธ์
+        // ==============================================
+
+        if (!result.success) {
+
+          throw new Error(
+
+            result.error ||
+            'ไม่สามารถโหลดข้อมูลการต่ออายุได้'
+
+          );
+
+        }
+
+
+        renewalResult = result;
+
+
+        // ==============================================
+        // 9. แสดงข้อมูล
+        // ==============================================
+
+        document.getElementById(
+          'renewalCode'
+        ).innerText =
+          result.ref || renewalCode;
+
+
+        document.getElementById(
+          'customerName'
+        ).innerText =
+          result.name || '-';
+
+
+        document.getElementById(
+          'parkingSlot'
+        ).innerText =
+          result.slot || '-';
+
+
+        document.getElementById(
+          'renewalMonth'
+        ).innerText =
+          result.month || '-';
+
+
+        document.getElementById(
+          'renewalAmount'
+        ).innerText =
+          Number(result.amount || 0)
+            .toLocaleString('th-TH') +
+          ' บาท';
+
+
+        document.getElementById(
+          'customerData'
+        ).style.display =
+          'block';
+
+
+        status.innerText =
+          '✓ ตรวจสอบข้อมูลสำเร็จ';
+
+
+      } catch (error) {
+
+        status.innerText =
+          '❌ เกิดข้อผิดพลาด\n\n' +
+          error.message;
+
+        console.error(error);
+
+      }
+
+    }
+
+
+    // ==================================================
+    // แสดงชื่อไฟล์
+    // ==================================================
+
+    document
+      .getElementById('slipFile')
+      .addEventListener(
+        'change',
+        function() {
+
+          const file =
+            this.files[0];
+
+
+          if (file) {
+
+            document.getElementById(
+              'fileName'
+            ).innerText =
+              '📄 ไฟล์ที่เลือก: ' +
+              file.name;
+
+          } else {
+
+            document.getElementById(
+              'fileName'
+            ).innerText = '';
+
+          }
+
+        }
       );
 
 
-    const result =
-      await response.json();
+    // ==================================================
+    // แปลงไฟล์เป็น Base64
+    // ==================================================
+
+    function fileToBase64(file) {
+
+      return new Promise(
+        (resolve, reject) => {
+
+          const reader =
+            new FileReader();
 
 
-    if (!result.success) {
+          reader.onload = () => {
 
-      throw new Error(
+            const base64 =
+              reader.result.split(',')[1];
 
-        result.error ||
-        'ไม่สามารถส่งหลักฐานได้'
+            resolve(base64);
 
+          };
+
+
+          reader.onerror =
+            reject;
+
+
+          reader.readAsDataURL(file);
+
+        }
       );
 
     }
 
 
-    status.innerText =
-      '✓ ส่งหลักฐานการชำระเงินเรียบร้อยแล้ว\n\n' +
-      'กรุณารอ Koon15 ตรวจสอบค่ะ';
+    // ==================================================
+    // ส่งสลิป
+    // ==================================================
+
+    async function submitSlip() {
+
+      const fileInput =
+        document.getElementById('slipFile');
 
 
-    button.innerText =
-      'ส่งสลิปเรียบร้อยแล้ว';
+      const button =
+        document.getElementById('submitButton');
 
 
-    button.style.background =
-      '#888';
+      const uploadStatus =
+        document.getElementById('uploadStatus');
 
 
-    document.getElementById(
-      'slipFile'
-    ).disabled =
-      true;
+      const file =
+        fileInput.files[0];
 
 
-  } catch (error) {
+      // ==============================================
+      // ตรวจสอบไฟล์
+      // ==============================================
+
+      if (!file) {
+
+        uploadStatus.innerText =
+          '❌ กรุณาเลือกไฟล์สลิปก่อนค่ะ';
+
+        return;
+
+      }
 
 
-    console.error(error);
+      if (file.size > 10 * 1024 * 1024) {
+
+        uploadStatus.innerText =
+          '❌ ไฟล์มีขนาดใหญ่เกิน 10 MB';
+
+        return;
+
+      }
 
 
-    status.innerText =
-      '❌ ไม่สามารถส่งหลักฐานได้\n\n' +
-      error.message;
+      try {
+
+        button.disabled = true;
+
+        button.style.opacity = '0.6';
 
 
-    button.disabled =
-      false;
-
-  }
-
-}
+        uploadStatus.innerText =
+          '⏳ กำลังส่งหลักฐานการชำระเงิน...';
 
 
-// =====================================================
-// START
-// =====================================================
+        // ============================================
+        // แปลงไฟล์
+        // ============================================
 
-main();
+        const fileBase64 =
+          await fileToBase64(file);
 
 
-</script>
+        // ============================================
+        // ส่งไป Apps Script
+        // ============================================
+
+        const response =
+          await fetch(
+
+            renewalBackendUrl,
+
+            {
+
+              method: 'POST',
+
+              headers: {
+
+                'Content-Type':
+                  'text/plain;charset=utf-8'
+
+              },
+
+              body:
+                JSON.stringify({
+
+                  ref:
+                    renewalCode,
+
+                  fileBase64:
+                    fileBase64,
+
+                  fileType:
+                    file.type,
+
+                  fileName:
+                    file.name
+
+                })
+
+            }
+
+          );
+
+
+        const result =
+          await response.json();
+
+
+        // ============================================
+        // ตรวจสอบผล
+        // ============================================
+
+        if (!result.success) {
+
+          throw new Error(
+
+            result.error ||
+            'ไม่สามารถส่งหลักฐานได้'
+
+          );
+
+        }
+
+
+        // ============================================
+        // สำเร็จ
+        // ============================================
+
+        uploadStatus.innerText =
+          '✅ ส่งหลักฐานการชำระเงินเรียบร้อยแล้ว\n\n' +
+          'Koon15 ได้รับสลิปของคุณแล้ว\n' +
+          'กรุณารอการตรวจสอบค่ะ';
+
+
+        button.innerText =
+          '✅ ส่งสลิปเรียบร้อยแล้ว';
+
+
+        button.style.background =
+          '#888';
+
+
+        fileInput.disabled =
+          true;
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        uploadStatus.innerText =
+          '❌ ไม่สามารถส่งหลักฐานได้\n\n' +
+          error.message;
+
+
+        button.disabled =
+          false;
+
+
+        button.style.opacity =
+          '1';
+
+      }
+
+    }
+
+
+    // ==================================================
+    // เริ่มระบบ
+    // ==================================================
+
+    main();
+
+  </script>
 
 </body>
 </html>
