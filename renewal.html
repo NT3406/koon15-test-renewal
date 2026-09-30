@@ -19,6 +19,27 @@
 
   <p id="status">กำลังเริ่มระบบ...</p>
 
+  <div id="customerData" style="display:none;">
+
+    <hr>
+
+    <p>
+      <strong>รหัสต่ออายุ</strong>
+    </p>
+    <p id="renewalCode"></p>
+
+    <p>
+      <strong>ชื่อผู้เช่า</strong>
+    </p>
+    <p id="customerName"></p>
+
+    <p>
+      <strong>ช่องจอดรถ</strong>
+    </p>
+    <p id="parkingSlot"></p>
+
+  </div>
+
   <script>
 
     async function main() {
@@ -28,10 +49,7 @@
 
       try {
 
-        // ------------------------------------------
         // 1. อ่านรหัสต่ออายุจาก URL
-        // ------------------------------------------
-
         const params =
           new URLSearchParams(
             window.location.search
@@ -40,10 +58,7 @@
         const urlCode =
           params.get('code');
 
-        // ------------------------------------------
-        // 2. ถ้ามีรหัสจาก URL ให้จำไว้
-        // ------------------------------------------
-
+        // 2. เก็บรหัสก่อนเข้า LINE Login
         if (urlCode) {
 
           sessionStorage.setItem(
@@ -53,10 +68,7 @@
 
         }
 
-        // ------------------------------------------
-        // 3. ดึงรหัสที่จำไว้
-        // ------------------------------------------
-
+        // 3. ดึงรหัสที่เก็บไว้
         const renewalCode =
           sessionStorage.getItem(
             'koon15RenewalCode'
@@ -69,22 +81,18 @@
             'กรุณาเปิดจากลิงก์ที่ Koon15 ส่งให้ค่ะ';
 
           return;
+
         }
 
-
-        // ------------------------------------------
         // 4. เริ่ม LIFF
-        // ------------------------------------------
-
         await liff.init({
-          liffId: '2011211599-0JqJ9GVy'
+
+          liffId:
+            '2011211599-0JqJ9GVy'
+
         });
 
-
-        // ------------------------------------------
-        // 5. ตรวจสอบ Login
-        // ------------------------------------------
-
+        // 5. Login LINE
         if (!liff.isLoggedIn()) {
 
           status.innerText =
@@ -93,61 +101,84 @@
           liff.login();
 
           return;
+
         }
 
-
-        // ------------------------------------------
-        // 6. ดึงข้อมูล LINE
-        // ------------------------------------------
-
+        // 6. อ่านข้อมูล LINE
         status.innerText =
-          'กำลังตรวจสอบข้อมูล LINE...';
+          'กำลังตรวจสอบข้อมูล...';
 
         const profile =
           await liff.getProfile();
 
-
-        // ------------------------------------------
-        // 7. ส่งข้อมูลไป Apps Script
-        // ------------------------------------------
-
+        // 7. บันทึก LINE User ID ลงระบบหลัก
         status.innerText =
-          'กำลังบันทึกข้อมูล...';
+          'กำลังเชื่อมต่อข้อมูล...';
 
         const backendUrl =
           'https://script.google.com/macros/s/AKfycbxOxtTc9SL07f2u2R_vLF0e91oHCH_uIQ8dcyAYWytFYD8bwAJ7RS94gHIAnh88l-s3DQ/exec';
 
+        await fetch(
+
+          backendUrl +
+          '?action=saveLineUserId' +
+          '&code=' +
+          encodeURIComponent(renewalCode) +
+          '&userId=' +
+          encodeURIComponent(profile.userId)
+
+        );
+
+        // 8. ขอข้อมูลลูกค้าจากระบบหลัก
+        status.innerText =
+          'กำลังโหลดข้อมูลการต่ออายุ...';
 
         const response =
           await fetch(
+
             backendUrl +
-            '?action=saveLineUserId' +
+            '?action=getRenewalData' +
             '&code=' +
-            encodeURIComponent(renewalCode) +
-            '&userId=' +
-            encodeURIComponent(profile.userId)
+            encodeURIComponent(renewalCode)
+
           );
 
-
         const result =
-          await response.text();
+          await response.json();
 
+        // 9. ตรวจสอบผลลัพธ์
+        if (!result.success) {
 
-        // ------------------------------------------
-        // 8. แสดงผล
-        // ------------------------------------------
+          throw new Error(
+            result.error ||
+            'ไม่สามารถโหลดข้อมูลได้'
+          );
+
+        }
+
+        // 10. แสดงข้อมูล
+        document.getElementById(
+          'renewalCode'
+        ).innerText =
+          result.code;
+
+        document.getElementById(
+          'customerName'
+        ).innerText =
+          result.name;
+
+        document.getElementById(
+          'parkingSlot'
+        ).innerText =
+          result.slot;
+
+        document.getElementById(
+          'customerData'
+        ).style.display =
+          'block';
 
         status.innerText =
-          '✓ เชื่อมต่อ LINE สำเร็จ\n\n' +
-          'รหัสต่ออายุ: ' +
-          renewalCode +
-          '\n\n' +
-          'ชื่อ LINE: ' +
-          profile.displayName +
-          '\n\n' +
-          'ผลการบันทึก:\n' +
-          result;
-
+          '✓ ตรวจสอบข้อมูลสำเร็จ';
 
       } catch (error) {
 
@@ -160,7 +191,6 @@
       }
 
     }
-
 
     main();
 
