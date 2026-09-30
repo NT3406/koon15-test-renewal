@@ -60,7 +60,7 @@
           );
 
         const urlCode =
-          params.get('code');
+  params.get('code') || params.get('ref');
 
         if (urlCode) {
 
