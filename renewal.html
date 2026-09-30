@@ -658,13 +658,14 @@
 
 
         const response =
-          await fetch(
+  await fetch(
 
-            renewalBackendUrl +
-            '?ref=' +
-            encodeURIComponent(renewalCode)
+    renewalBackendUrl +
+    '?action=getRenewalData' +
+    '&code=' +
+    encodeURIComponent(renewalCode)
 
-          );
+  );
 
 
         const result =
