@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -308,15 +310,15 @@
     }
 
   </style>
+
 </head>
+
 
 <body>
 
   <div class="container">
 
-    <!-- =========================
-         Header
-    ========================= -->
+    <!-- Header -->
 
     <div class="header">
 
@@ -331,18 +333,14 @@
     </div>
 
 
-    <!-- =========================
-         Status
-    ========================= -->
+    <!-- Status -->
 
     <p id="status">
       กำลังเริ่มระบบ...
     </p>
 
 
-    <!-- =========================
-         Customer Data
-    ========================= -->
+    <!-- Customer Data -->
 
     <div id="customerData" style="display:none;">
 
@@ -425,9 +423,7 @@
       </div>
 
 
-      <!-- =========================
-           Payment
-      ========================= -->
+      <!-- Payment -->
 
       <div class="card">
 
@@ -458,9 +454,7 @@
       </div>
 
 
-      <!-- =========================
-           Upload Slip
-      ========================= -->
+      <!-- Upload Slip -->
 
       <div class="card">
 
@@ -532,6 +526,112 @@
 
 
     // ==================================================
+    // อ่านรหัสต่ออายุ
+    // รองรับ:
+    // 1. ?code=K15-0002
+    // 2. ?ref=K15-0002
+    // 3. liff.state
+    // 4. sessionStorage
+    // ==================================================
+
+    function extractCodeFromText(text) {
+
+      if (!text) {
+        return '';
+      }
+
+      try {
+
+        let value = text;
+
+        // กรณีเป็น URL เต็ม
+        if (
+          value.startsWith('http://') ||
+          value.startsWith('https://')
+        ) {
+
+          const url =
+            new URL(value);
+
+          const code =
+            url.searchParams.get('code') ||
+            url.searchParams.get('ref');
+
+          if (code) {
+            return code;
+          }
+
+          value =
+            url.searchParams.get('liff.state') ||
+            '';
+
+        }
+
+        // กรณีเริ่มด้วย ?
+        if (value.startsWith('?')) {
+          value = value.substring(1);
+        }
+
+        // กรณีเป็น query string
+        if (
+          value.includes('code=') ||
+          value.includes('ref=')
+        ) {
+
+          const params =
+            new URLSearchParams(value);
+
+          return (
+            params.get('code') ||
+            params.get('ref') ||
+            ''
+          );
+
+        }
+
+        // กรณี liff.state ถูก encode
+        try {
+
+          const decoded =
+            decodeURIComponent(value);
+
+          if (
+            decoded.includes('code=') ||
+            decoded.includes('ref=')
+          ) {
+
+            const params =
+              new URLSearchParams(
+                decoded.startsWith('?')
+                  ? decoded.substring(1)
+                  : decoded
+              );
+
+            return (
+              params.get('code') ||
+              params.get('ref') ||
+              ''
+            );
+
+          }
+
+        } catch (e) {}
+
+      } catch (e) {
+
+        console.error(
+          'extractCode error:',
+          e
+        );
+
+      }
+
+      return '';
+
+    }
+
+
+    // ==================================================
     // เริ่มระบบ
     // ==================================================
 
@@ -544,39 +644,86 @@
       try {
 
         // ==============================================
-        // 1. อ่านรหัสจาก URL
+        // 1. เริ่ม LIFF ก่อน
         // ==============================================
 
-        const params =
+        status.innerText =
+          'กำลังเชื่อมต่อ LINE...';
+
+
+        await liff.init({
+
+          liffId:
+            '2011211599-0JqJ9GVy'
+
+        });
+
+
+        // ==============================================
+        // 2. อ่าน code จาก URL ปัจจุบัน
+        // ==============================================
+
+        const currentParams =
           new URLSearchParams(
             window.location.search
           );
 
 
-        const urlCode =
-          params.get('code') ||
-          params.get('ref');
+        let code =
+          currentParams.get('code') ||
+          currentParams.get('ref') ||
+          '';
 
 
-        if (urlCode) {
+        // ==============================================
+        // 3. อ่านจาก liff.state
+        // ==============================================
+
+        if (!code && liff.state) {
+
+          code =
+            extractCodeFromText(
+              liff.state
+            );
+
+        }
+
+
+        // ==============================================
+        // 4. อ่านจาก sessionStorage
+        // ==============================================
+
+        if (!code) {
+
+          code =
+            sessionStorage.getItem(
+              'koon15RenewalCode'
+            ) ||
+            '';
+
+        }
+
+
+        // ==============================================
+        // 5. ถ้าเจอ code ให้บันทึก
+        // ==============================================
+
+        if (code) {
+
+          renewalCode =
+            code.trim();
 
           sessionStorage.setItem(
             'koon15RenewalCode',
-            urlCode
+            renewalCode
           );
 
         }
 
 
         // ==============================================
-        // 2. ดึงรหัสที่เก็บไว้
+        // 6. ถ้ายังไม่พบ code
         // ==============================================
-
-        renewalCode =
-          sessionStorage.getItem(
-            'koon15RenewalCode'
-          );
-
 
         if (!renewalCode) {
 
@@ -590,19 +737,7 @@
 
 
         // ==============================================
-        // 3. เริ่ม LIFF
-        // ==============================================
-
-        await liff.init({
-
-          liffId:
-            '2011211599-0JqJ9GVy'
-
-        });
-
-
-        // ==============================================
-        // 4. Login LINE
+        // 7. Login LINE
         // ==============================================
 
         if (!liff.isLoggedIn()) {
@@ -618,7 +753,7 @@
 
 
         // ==============================================
-        // 5. อ่าน LINE User ID
+        // 8. อ่าน LINE User ID
         // ==============================================
 
         status.innerText =
@@ -630,7 +765,7 @@
 
 
         // ==============================================
-        // 6. บันทึก LINE User ID
+        // 9. บันทึก LINE User ID
         // ==============================================
 
         status.innerText =
@@ -642,15 +777,19 @@
           saveBackendUrl +
           '?action=saveLineUserId' +
           '&code=' +
-          encodeURIComponent(renewalCode) +
+          encodeURIComponent(
+            renewalCode
+          ) +
           '&userId=' +
-          encodeURIComponent(profile.userId)
+          encodeURIComponent(
+            profile.userId
+          )
 
         );
 
 
         // ==============================================
-        // 7. ดึงข้อมูลการต่ออายุ
+        // 10. ดึงข้อมูลการต่ออายุ
         // ==============================================
 
         status.innerText =
@@ -658,14 +797,16 @@
 
 
         const response =
-  await fetch(
+          await fetch(
 
-    renewalBackendUrl +
-    '?action=getRenewalData' +
-    '&code=' +
-    encodeURIComponent(renewalCode)
+            renewalBackendUrl +
+            '?action=getRenewalData' +
+            '&code=' +
+            encodeURIComponent(
+              renewalCode
+            )
 
-  );
+          );
 
 
         const result =
@@ -673,7 +814,7 @@
 
 
         // ==============================================
-        // 8. ตรวจสอบผลลัพธ์
+        // 11. ตรวจสอบผลลัพธ์
         // ==============================================
 
         if (!result.success) {
@@ -688,42 +829,49 @@
         }
 
 
-        renewalResult = result;
+        renewalResult =
+          result;
 
 
         // ==============================================
-        // 9. แสดงข้อมูล
+        // 12. แสดงข้อมูล
         // ==============================================
 
         document.getElementById(
           'renewalCode'
         ).innerText =
-          result.ref || renewalCode;
+          result.code ||
+          result.ref ||
+          renewalCode;
 
 
         document.getElementById(
           'customerName'
         ).innerText =
-          result.name || '-';
+          result.name ||
+          '-';
 
 
         document.getElementById(
           'parkingSlot'
         ).innerText =
-          result.slot || '-';
+          result.slot ||
+          '-';
 
 
         document.getElementById(
           'renewalMonth'
         ).innerText =
-          result.month || '-';
+          result.month ||
+          '-';
 
 
         document.getElementById(
           'renewalAmount'
         ).innerText =
-          Number(result.amount || 0)
-            .toLocaleString('th-TH') +
+          Number(
+            result.amount || 0
+          ).toLocaleString('th-TH') +
           ' บาท';
 
 
@@ -739,11 +887,12 @@
 
       } catch (error) {
 
+        console.error(error);
+
+
         status.innerText =
           '❌ เกิดข้อผิดพลาด\n\n' +
           error.message;
-
-        console.error(error);
 
       }
 
@@ -776,7 +925,8 @@
 
             document.getElementById(
               'fileName'
-            ).innerText = '';
+            ).innerText =
+              '';
 
           }
 
@@ -826,15 +976,21 @@
     async function submitSlip() {
 
       const fileInput =
-        document.getElementById('slipFile');
+        document.getElementById(
+          'slipFile'
+        );
 
 
       const button =
-        document.getElementById('submitButton');
+        document.getElementById(
+          'submitButton'
+        );
 
 
       const uploadStatus =
-        document.getElementById('uploadStatus');
+        document.getElementById(
+          'uploadStatus'
+        );
 
 
       const file =
@@ -855,7 +1011,10 @@
       }
 
 
-      if (file.size > 10 * 1024 * 1024) {
+      if (
+        file.size >
+        10 * 1024 * 1024
+      ) {
 
         uploadStatus.innerText =
           '❌ ไฟล์มีขนาดใหญ่เกิน 10 MB';
@@ -867,9 +1026,11 @@
 
       try {
 
-        button.disabled = true;
+        button.disabled =
+          true;
 
-        button.style.opacity = '0.6';
+        button.style.opacity =
+          '0.6';
 
 
         uploadStatus.innerText =
@@ -999,4 +1160,5 @@
   </script>
 
 </body>
+
 </html>
